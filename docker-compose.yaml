@@ -1,0 +1,60 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - "./dumps/dump.sql:/docker-entrypoint-initdb.d/dump.sql"
+  zookeeper:
+    image: wurstmeister/zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+  kafka:
+    image: wurstmeister/kafka
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      - zookeeper
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+      - 1080:1080
+  piko-admin:
+    image: piko/piko-admin
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: e2e
+      AWS_ACCESS_KEY_ID: [secret]
+      AWS_SECRET_ACCESS_KEY: [secret]
+      AWS_REGION: eu-west-1
+    ports:
+      - 18080:8080
+    volumes:
+      - ./configs/piko-admin-e2e.yaml:/var/piko-admin/application-e2e.yaml
+  piko-locations:
+    image: piko/piko-locations
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: e2e
+    ports:
+      - 18090:8080
+    volumes:
+      - ./configs/piko-locations-e2e.yaml:/var/piko-locations/application-e2e.yaml
+  piko-maps:
+    image: piko/piko-maps
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: e2e
+    ports:
+      - 19000:8080
+    volumes:
+      - ./configs/piko-maps-e2e.yaml:/var/piko-maps/application-e2e.yaml

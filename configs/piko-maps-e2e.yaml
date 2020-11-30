@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/piko_maps
+    username: piko_maps
+    password: piko_maps
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: kafka:9092

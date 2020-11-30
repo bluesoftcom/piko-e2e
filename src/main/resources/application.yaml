@@ -1,0 +1,10 @@
+spring:
+  main:
+    banner-mode: off
+cognito:
+  user-pool-id: eu-west-1_ka4APzVaT
+  app-client-id: 7qjajc82fgttohfsfdar8l20bc
+
+piko-locations.url: http://localhost:18090
+piko-admin.url: http://localhost:18080
+piko-maps.url: http://localhost:19000
